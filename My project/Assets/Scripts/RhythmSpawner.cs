@@ -10,6 +10,7 @@ public class RhythmSpawner : MonoBehaviour
     [SerializeField] private BeatClock beatClock;
     [SerializeField] private ProjectilePool pool;
     [SerializeField] private Transform coreTarget;
+    [SerializeField] private RhythmJudge rhythmJudge;
 
     [Header("Perimeter spawn points")]
     [SerializeField] private Transform[] spawnPoints;
@@ -45,7 +46,7 @@ public class RhythmSpawner : MonoBehaviour
         p.transform.position = spawnPoint.position;
 
         IMovementStrategy strategy = PickStrategy(spawnPoint);
-        p.Initialise(strategy, coreTarget.position);
+        p.Initialise(strategy, coreTarget.position, rhythmJudge);
     }
 
 
