@@ -10,12 +10,15 @@ public class Projectile : MonoBehaviour, IPoolable
 
     [SerializeField] private int damage = 1;
 
+    public RhythmJudge RhythmJudge { private get; set; }
+
     private IMovementStrategy _strategy;
     private bool _active;
 
-    public void Initialise(IMovementStrategy strategy, Vector2 targetPosition) //Called by RhythmSpawner after Rent()
+    public void Initialise(IMovementStrategy strategy, Vector2 targetPosition, RhythmJudge judge) //Called by RhythmSpawner after Rent()
     {
         _strategy = strategy;
+        RhythmJudge = judge;
         _strategy.Init(transform, targetPosition);
         _active = true;
     }
@@ -26,7 +29,11 @@ public class Projectile : MonoBehaviour, IPoolable
         if (!_active || _strategy == null) return;
 
         bool reached = _strategy.Tick(transform, Time.deltaTime);
-        if (reached) ReturnToPool();   // missed — no collision, projectile arrived
+        if (reached) {
+            RhythmJudge?.NotifyProjectileHitCore();
+            ReturnToPool();   // missed, no collision, projectile arrived
+        }
+        
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -36,6 +43,7 @@ public class Projectile : MonoBehaviour, IPoolable
         if (other.TryGetComponent<IDamageable>(out var target))
         {
             target.TakeDamage(damage);
+            RhythmJudge?.NotifyProjectileHitCore();
             ReturnToPool();
         }
     }
@@ -54,6 +62,7 @@ public class Projectile : MonoBehaviour, IPoolable
     public void ResetState()
     {
         // Unsubscribe from events
+        RhythmJudge = null;
         _strategy?.Reset();
         _strategy = null;
         _active = false;
