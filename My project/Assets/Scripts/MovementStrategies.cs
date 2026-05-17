@@ -74,3 +74,44 @@ public class SpiralStrategy : IMovementStrategy
     }
 }
 
+public class PulseStrategy : IMovementStrategy
+{
+    private readonly float _baseSpeed;
+    private readonly float _pulseFrequency; // should match BeatClock.BeatInterval
+
+    private Vector2 _direction;
+    private Vector2 _targetPos;
+    private float _elapsed;
+
+    public PulseStrategy(float speed, float pulseFrequency)
+    {
+        _baseSpeed = speed;
+        _pulseFrequency = pulseFrequency;
+    }
+
+    public void Init(Transform projectile, Vector2 targetPosition)
+    {
+        _targetPos = targetPosition;
+        _direction = (targetPosition - (Vector2)projectile.position).normalized;
+        _elapsed = 0f;
+    }
+
+    public bool Tick(Transform projectile, float deltaTime)
+    {
+        _elapsed += deltaTime;
+
+        // Speed oscillates between 0.2x and 1.8x base speed on the beat frequency
+        float t = Mathf.Sin((_elapsed / _pulseFrequency) * Mathf.PI);
+        float currentSpeed = _baseSpeed * (0.2f + 1.6f * Mathf.Abs(t));
+
+        projectile.Translate(_direction * (currentSpeed * deltaTime));
+
+        return Vector2.Dot(
+            _targetPos - (Vector2)projectile.position,
+            _direction) <= 0f;
+    }
+
+    public void Reset() => _elapsed = 0f;
+}
+
+

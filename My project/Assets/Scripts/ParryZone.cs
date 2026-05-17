@@ -28,6 +28,7 @@ public class ParryZone : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log($"ParryZone hit by: {other.gameObject.name}");
         if (!other.TryGetComponent<Projectile>(out var projectile)) return;
 
         if (ParryPressedThisFrame)
@@ -36,5 +37,11 @@ public class ParryZone : MonoBehaviour
             pool.Return(projectile);
         }
         // else: projectile continues toward core naturally
+    }
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (!ParryPressedThisFrame) return;
+        if (!other.TryGetComponent<Projectile>(out var projectile)) return;
+        pool.Return(projectile);
     }
 }

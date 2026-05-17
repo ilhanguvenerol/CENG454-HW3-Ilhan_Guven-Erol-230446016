@@ -28,6 +28,7 @@ public class PlayerInput : MonoBehaviour
 
     private void HandleParryInput()
     {
+        ParryZone.ParryPressedThisFrame = true;
         ParryGrade grade = rhythmJudge.EvaluateParry();
 
         switch (grade)
