@@ -12,10 +12,20 @@ public class RhythmJudge : MonoBehaviour
     //Timing window
     [Header("Timing Windows")]
     [Tooltip("Within this distance from the beat = Perfect")]
-    [SerializeField] private float perfectWindow = 0.06f;
+    [SerializeField] private float perfectWindowBase = 0.06f;
 
     [Tooltip("Within this distance from the beat = Good")]
-    [SerializeField] private float goodWindow    = 0.12f;
+    [SerializeField] private float goodWindowBase    = 0.12f;
+
+    // Exposed as properties so DoubleWindowDecorator can widen and restore them
+    public float PerfectWindow { get; set; }
+    public float GoodWindow { get; set; }
+
+    private void Awake()
+    {
+        PerfectWindow = perfectWindowBase;
+        GoodWindow = goodWindowBase;
+    }
 
     // Outside goodWindow = Miss
 
@@ -60,8 +70,8 @@ public class RhythmJudge : MonoBehaviour
     //Private methods
     private ParryGrade Classify(float distanceToBeat)
     {
-        if (distanceToBeat <= perfectWindow) return ParryGrade.Perfect;
-        if (distanceToBeat <= goodWindow)    return ParryGrade.Good;
+        if (distanceToBeat <= PerfectWindow) return ParryGrade.Perfect;
+        if (distanceToBeat <= GoodWindow)    return ParryGrade.Good;
         return ParryGrade.Miss;
     }
 
